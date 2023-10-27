@@ -1,0 +1,68 @@
+Given strings A, B, and C, find whether C is formed by an interleaving of A and B.
+
+An interleaving of two strings S and T is a configuration such that it creates a new string Y from the concatenation substrings of A and B and |Y| = |A + B| = |C|
+
+For example:
+
+A = "XYZ"
+
+B = "ABC"
+
+so we can make multiple interleaving string Y like, XYZABC, XAYBCZ, AXBYZC, XYAZBC and many more so here your task is to check whether you can create a string Y which can be equal to C.
+
+Specifically, you just need to create substrings of string A and create substrings B and concatenate them and check whether it is equal to C or not.
+
+Note: a + b is the concatenation of strings a and b.
+
+Return true if C is formed by an interleaving of A and B, else return false.
+
+Example 1:
+
+Input:
+A = YX, B = X, C = XXY
+Output: 0
+Explanation: XXY is not interleaving
+of YX and X
+Example 2:
+
+Input:
+A = XY, B = X, C = XXY
+Output: 1
+Explanation: XXY is interleaving of
+XY and X.
+
+
+
+def isInterleave(A, B, C):
+    lenA, lenB, lenC = len(A), len(B), len(C)
+
+    # If the total length of A and B is not equal to the length of C, it's impossible to form C from interleaving A and B.
+    if lenA + lenB != lenC:
+        return False
+
+    # Create a dynamic programming table dp where dp[i][j] will be True if C[0:i+j] can be formed by interleaving A[0:i] and B[0:j].
+    dp = [[False] * (lenB + 1) for _ in range(lenA + 1)]
+
+    for i in range(lenA + 1):
+        for j in range(lenB + 1):
+            # If both A and B are empty, C is empty, and they can be considered interleaved.
+            if i == 0 and j == 0:
+                dp[i][j] = True
+            # If A is empty, compare C[j-1] with B[j-1] and see if it matches.
+            elif i == 0:
+                dp[i][j] = dp[i][j - 1] and B[j - 1] == C[i + j - 1]
+            # If B is empty, compare C[i-1] with A[i-1] and see if it matches.
+            elif j == 0:
+                dp[i][j] = dp[i - 1][j] and A[i - 1] == C[i + j - 1]
+            # If both A and B are not empty, check if the previous characters in A and B match C.
+            else:
+                dp[i][j] = (dp[i - 1][j] and A[i - 1] == C[i + j - 1]) or (dp[i][j - 1] and B[j - 1] == C[i + j - 1])
+
+    return dp[lenA][lenB]
+
+# Example usage
+A = "XY"
+B = "X"
+C = "XXY"
+result = isInterleave(A, B, C)
+print(result)  # Output: 1
